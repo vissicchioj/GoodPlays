@@ -52,7 +52,7 @@ The core loop is...
 
 ---
 
-## 🧱 Tech Stack
+## Tech Stack
 
 ### Frontend
 - Next.js App Router
