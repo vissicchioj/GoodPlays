@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Goodplays
 
-## Getting Started
+Goodplays is a video game tracking/review app inspired by Goodreads and Letterboxd. 
+Users can discover games, save games to their personal library, update play status, and manage their backlog.
 
-First, run the development server:
+This is a full-stack application using Next.js, PostgreSQL, Prisma, Auth.js/NextAuth, and the IGDB API.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Overview
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Goodplays helps users keep track of what they are playing as well as tracking what they may play next
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The core loop is...
 
-## Learn More
+1. Discover games through search or through the front page
+2. View game details
+3. Add games to a personal library
+4. Track each game by status:
+   - Backlog - Plan to play
+   - Playing - Currently playing
+   - Completed - Finished playing
+   - Dropped - Stopped playing (Didn't finish)
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Current Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Authentication
+- GitHub OAuth login
+- Persistent user sessions
+- Personal library page
 
-## Deploy on Vercel
+### Game Discovery
+- Search games using the IGDB API: https://api-docs.igdb.com
+- View trending/recent games on initial homepage load - Popular games from the last 3 months
+- Click games to open a modal with more details:
+  - Cover image
+  - Title
+  - Add to Backlog button
+  - Summary
+  - Release date
+  - Total rating
+  - Available Platforms
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Library Management
+- Add games to backlog
+- View saved games in the "My Library" page
+- Update game status
+- Remove games from library
+- Similar to Game Discovery, you may click games to open a modal with more details
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🧱 Tech Stack
+
+### Frontend
+- Next.js App Router
+- React
+- TypeScript
+- Tailwind CSS
+
+### Backend
+- Next.js Server Actions
+- Next.js Route Handlers
+- Auth.js / NextAuth
+- Prisma ORM
+
+### Database
+- PostgreSQL
+- Neon
+
+### External API
+- IGDB API
+- Twitch OAuth Client Credentials Flow
+
+---
