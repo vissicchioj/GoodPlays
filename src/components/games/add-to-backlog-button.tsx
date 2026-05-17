@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { addGameLog } from "../../server/actions/add-game-log";
+import { signIn, useSession } from "next-auth/react";
 
 type AddToBacklogButtonProps = {
   game: any;
@@ -26,13 +27,22 @@ export function AddToBacklogButton({
   className = "",
   stopPropagation = false,
 }: AddToBacklogButtonProps) {
+  const { data: session, status: sessionStatus } = useSession();
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isInLibrary = Boolean(libraryStatus);
+  const isCheckingSession = sessionStatus === "loading";
 
   async function handleAdd() {
-    if (isInLibrary) return;
+    if (isInLibrary || isAdding) return;
+
+    if (!session) {
+      signIn("github", {
+        callbackUrl: window.location.href,
+      });
+      return;
+    }
 
     try {
       setIsAdding(true);
@@ -52,7 +62,7 @@ export function AddToBacklogButton({
   return (
     <div className="flex flex-col items-center gap-2">
       <button
-        disabled={isAdding || isInLibrary}
+        disabled={isAdding || isInLibrary|| isCheckingSession}
         onClick={(e) => {
           if (stopPropagation) {
             e.stopPropagation();
@@ -62,11 +72,17 @@ export function AddToBacklogButton({
         }}
         className={`rounded-lg px-4 py-2 font-medium transition disabled:cursor-not-allowed disabled:opacity-80 ${className}`}
       >
-        {isAdding
-          ? "Adding..."
-          : isInLibrary
-            ? `In Library ✓${libraryStatus ? ` (${formatStatus(libraryStatus)})` : ""}`
-            : "+ Backlog"}
+        {isCheckingSession
+          ? "Checking..."
+          : isAdding
+            ? "Adding..."
+            : isInLibrary
+              ? `In Library ✓${
+                  libraryStatus ? ` (${formatStatus(libraryStatus)})` : ""
+                }`
+              : session
+                ? "+ Backlog"
+                : "Sign in to add"}
       </button>
 
       {error && (
