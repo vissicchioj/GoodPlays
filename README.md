@@ -5,6 +5,8 @@ Users can discover games, save games to their personal library, update play stat
 
 This is a full-stack application using Next.js, PostgreSQL, Prisma, Auth.js/NextAuth, and the IGDB API.
 
+Goodplays is currently in active development.
+
 ---
 
 ## Project Overview
