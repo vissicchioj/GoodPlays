@@ -4,8 +4,8 @@ export async function searchGames(search?: string) {
   // current unix timestamp
   const now = Math.floor(Date.now() / 1000);
 
-  // 90 days ago
-  const daysAgo = now - 60 * 60 * 24 * 90;
+  // 80 days ago
+  const daysAgo = now - 60 * 60 * 24 * 80;
 
   // ========================
   // TRENDING GAMES
@@ -24,6 +24,10 @@ export async function searchGames(search?: string) {
         total_rating_count,
         platforms.name,
         platforms.abbreviation,
+        genres.id,
+        genres.name,
+        follows,
+        hypes,
         version_parent;
 
       where
@@ -57,6 +61,8 @@ export async function searchGames(search?: string) {
       total_rating_count,
       platforms.name,
       platforms.abbreviation,
+      genres.id,
+      genres.name,
       version_parent;
 
     where

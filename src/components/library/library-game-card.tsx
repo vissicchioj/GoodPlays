@@ -11,6 +11,11 @@ type Platform = {
   abbreviation?: string;
 };
 
+type Genre = {
+  id?: string | number;
+  name?: string;
+};
+
 type LibraryGameCardProps = {
   entry: {
     id: string;
@@ -25,6 +30,7 @@ type LibraryGameCardProps = {
       releaseDate?: Date | string | null;
       totalRating?: number | null;
       platforms?: Platform[] | null;
+      genres?: Genre[] | null;
     };
   };
 };
@@ -51,6 +57,7 @@ export function LibraryGameCard({ entry }: LibraryGameCardProps) {
       : undefined,
     total_rating: entry.game.totalRating ?? undefined,
     platforms: entry.game.platforms ?? undefined,
+    genres: entry.game.genres ?? undefined,
   };
 
   return (

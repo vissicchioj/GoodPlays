@@ -9,6 +9,11 @@ type Platform = {
   abbreviation?: string;
 };
 
+type Genre = {
+  id?: number | string;
+  name?: string;
+};
+
 type Game = {
   id: string;
   slug?: string;
@@ -20,6 +25,7 @@ type Game = {
   first_release_date?: number;
   total_rating?: number;
   platforms?: Platform[];
+  genres?: Genre[];
 };
 
 type GameModalProps = {
@@ -62,8 +68,9 @@ export function GameModal({ game, onClose, actions }: GameModalProps) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
       onClick={onClose}
     >
+    <div className="flex min-h-full items-center justify-center">
       <div
-        className="relative grid max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl md:grid-cols-[360px_1fr]"
+        className="relative grid max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl md:grid-cols-[340px_1fr]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* CLOSE BUTTON */}
@@ -75,16 +82,16 @@ export function GameModal({ game, onClose, actions }: GameModalProps) {
         </button>
 
         {/* LEFT SIDE — COVER */}
-        <div className="bg-gray-900 pr-1">
+        <div className="bg-gray-900 p-6 md:flex md:items-center md:justify-center">
           <img
             src={coverUrl}
             alt={game.name}
-            className="h-full max-h-[90vh] w-full object-cover flex-shrink-0"
+            className="mx-auto aspect-[3/4] max-h-[70vh] w-full max-w-[300px] rounded-xl object-cover shadow-lg"
           />
         </div>
 
         {/* RIGHT SIDE — DETAILS */}
-        <div className="overflow-y-auto p-8">
+        <div className="max-h-[55vh] overflow-y-auto p-6 md:max-h-[90vh] md:p-8">
           <h2 className="mb-4 pr-10 text-3xl font-bold text-gray-900">
             {game.name}
           </h2>
@@ -99,7 +106,6 @@ export function GameModal({ game, onClose, actions }: GameModalProps) {
             </span>
           </div>
 
-          {/* Shows backlog button in Discover, shows status select in Library */}
           <div className="mb-3 flex flex-wrap gap-3">
             {actions && (
             <div className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
@@ -116,6 +122,29 @@ export function GameModal({ game, onClose, actions }: GameModalProps) {
             <p className="leading-7 text-gray-700">
               {game.summary ?? "No summary available for this game yet."}
             </p>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+              Genres
+            </h3>
+
+            {game.genres && game.genres.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {game.genres.map((genre) => (
+                  <span
+                    key={`${genre.id ?? genre.name}`}
+                    className="rounded-lg border border-purple-200 bg-purple-50 px-3 py-2 text-sm font-medium text-purple-700 shadow-sm"
+                  >
+                    {genre.name}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">
+                Genre information unavailable.
+              </p>
+            )}
           </div>
 
           <div>
@@ -142,6 +171,7 @@ export function GameModal({ game, onClose, actions }: GameModalProps) {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

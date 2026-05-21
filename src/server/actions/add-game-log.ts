@@ -20,6 +20,11 @@ type Platform = {
   abbreviation?: string;
 };
 
+type Genre = {
+  id?: number;
+  name?: string;
+};
+
 type IgdbGame = {
   id: number;
   slug?: string;
@@ -28,10 +33,11 @@ type IgdbGame = {
   cover?: {
     url?: string;
   };
-  status: string;
-  first_release_date: number;
-  total_rating: number;
-  platforms: Platform[];
+  status?: string;
+  first_release_date?: number;
+  total_rating?: number;
+  platforms?: Platform[];
+  genres?: Genre[];
 };
 
 export async function addGameLog(game: IgdbGame, status = "backlog") {
@@ -51,10 +57,11 @@ export async function addGameLog(game: IgdbGame, status = "backlog") {
       coverUrl,
       summary: game.summary ?? null,
       releaseDate: game.first_release_date
-      ? new Date(game.first_release_date * 1000)
-      : null,
+        ? new Date(game.first_release_date * 1000)
+        : null,
       totalRating: game.total_rating ?? null,
       platforms: game.platforms ?? [],
+      genres: game.genres ?? [],
     },
     create: {
       igdbId: game.id,
@@ -63,10 +70,11 @@ export async function addGameLog(game: IgdbGame, status = "backlog") {
       summary: game.summary ?? null,
       coverUrl,
       releaseDate: game.first_release_date
-      ? new Date(game.first_release_date * 1000)
-      : null,
+        ? new Date(game.first_release_date * 1000)
+        : null,
       totalRating: game.total_rating ?? null,
       platforms: game.platforms ?? [],
+      genres: game.genres ?? [],
     },
   });
 

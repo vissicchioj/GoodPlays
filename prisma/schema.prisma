@@ -42,6 +42,7 @@ model Game {
   releaseDate DateTime?
   totalRating Float?
   platforms   Json?
+  genres      Json?
   createdAt   DateTime @default(now())
 
   gameLogs    GameLog[]
