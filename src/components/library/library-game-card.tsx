@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { StatusSelect } from "./status-select";
 import { RemoveButton } from "./remove-button";
+import { GameTagManager } from "./game-tag-manager";
 import { GameModal } from "../games/game-modal";
 
 type Platform = {
@@ -16,10 +17,21 @@ type Genre = {
   name?: string;
 };
 
+type LibraryTag = {
+  id: string;
+  name: string;
+};
+
+type GameLogTag = {
+  id: string;
+  tag: LibraryTag;
+};
+
 type LibraryGameCardProps = {
   entry: {
     id: string;
     status: string;
+    tags: GameLogTag[];
     game: {
       id: string;
       igdbId?: number;
@@ -33,9 +45,10 @@ type LibraryGameCardProps = {
       genres?: Genre[] | null;
     };
   };
+  allTags: LibraryTag[];
 };
 
-export function LibraryGameCard({ entry }: LibraryGameCardProps) {
+export function LibraryGameCard({ entry, allTags }: LibraryGameCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const coverUrl = entry.game.coverUrl
@@ -44,7 +57,7 @@ export function LibraryGameCard({ entry }: LibraryGameCardProps) {
 
   const modalGame = {
     id: entry.game.igdbId ?? entry.game.id,
-    slug: entry.game.slug,
+    slug: entry.game.slug ?? undefined,
     name: entry.game.title,
     summary: entry.game.summary ?? undefined,
     cover: entry.game.coverUrl
@@ -89,6 +102,7 @@ export function LibraryGameCard({ entry }: LibraryGameCardProps) {
           game={modalGame}
           onClose={() => setIsModalOpen(false)}
           actions={
+            <div className="space-y-5">
             <div className="flex flex-wrap items-center gap-3">
               <StatusSelect
                 gameLogId={entry.id}
@@ -96,6 +110,12 @@ export function LibraryGameCard({ entry }: LibraryGameCardProps) {
               />
 
               <RemoveButton gameLogId={entry.id} />
+            </div>
+            <GameTagManager
+                gameLogId={entry.id}
+                currentTags={entry.tags}
+                allTags={allTags}
+              />
             </div>
           }
         />

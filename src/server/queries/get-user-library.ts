@@ -8,6 +8,11 @@ export async function getUserLibrary(userId: string) {
 
     include: {
       game: true,
+      tags: {
+        include: {
+          tag: true,
+        },
+      },
     },
 
     orderBy: {

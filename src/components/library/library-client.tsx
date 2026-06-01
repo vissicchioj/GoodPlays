@@ -5,6 +5,16 @@ import { LibraryGameCard } from "./library-game-card";
 
 type GameStatus = "all" | "backlog" | "playing" | "completed" | "dropped";
 
+type LibraryTag = {
+  id: string;
+  name: string;
+};
+
+type GameLogTag = {
+  id: string;
+  tag: LibraryTag;
+};
+
 type Platform = {
   id?: string | number;
   name?: string;
@@ -19,6 +29,7 @@ type Genre = {
 type LibraryEntry = {
   id: string;
   status: "backlog" | "playing" | "completed" | "dropped";
+  tags: GameLogTag[];
   game: {
     id: string;
     igdbId?: number | null;
@@ -99,6 +110,20 @@ export function LibraryClient({ library }: LibraryClientProps) {
       return matchesStatus && matchesGenre;
     });
   }, [library, selectedStatus, selectedGenre]);
+
+  const allLibraryTags = useMemo(() => {
+  const tagMap = new Map<string, LibraryTag>();
+
+  for (const entry of library) {
+    for (const gameLogTag of entry.tags) {
+      tagMap.set(gameLogTag.tag.id, gameLogTag.tag);
+    }
+  }
+
+  return Array.from(tagMap.values()).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+}, [library]);
 
   function clearFilters() {
     setSelectedStatus("all");
@@ -254,7 +279,11 @@ export function LibraryClient({ library }: LibraryClientProps) {
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredLibrary.map((entry) => (
-              <LibraryGameCard key={entry.id} entry={entry} />
+              <LibraryGameCard
+                key={entry.id}
+                entry={entry}
+                allTags={allLibraryTags}
+              />
             ))}
           </div>
         </>

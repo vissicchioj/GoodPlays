@@ -28,6 +28,7 @@ model User {
   emailVerified String?
 
   gameLogs  GameLog[]
+  libraryTags LibraryTag[]
   accounts Account[]
   sessions Session[]
 }
@@ -57,6 +58,8 @@ model GameLog {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  tags GameLogTag[]
 
   @@unique([userId, gameId])
 }
@@ -95,4 +98,27 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model LibraryTag {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  createdAt DateTime @default(now())
+
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameLogs  GameLogTag[]
+
+  @@unique([userId, name])
+}
+
+model GameLogTag {
+  id        String @id @default(cuid())
+  gameLogId String
+  tagId     String
+
+  gameLog   GameLog    @relation(fields: [gameLogId], references: [id], onDelete: Cascade)
+  tag       LibraryTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([gameLogId, tagId])
 }
