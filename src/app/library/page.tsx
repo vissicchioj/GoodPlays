@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { authOptions } from "../../lib/auth";
 import { Navbar } from "../../components/layout/navbar";
+import { Footer } from "../../components/layout/footer";
 import { LibraryClient } from "../../components/library/library-client";
 import { getUserLibrary } from "../../server/queries/get-user-library";
 
@@ -29,6 +30,8 @@ export default async function LibraryPage() {
 
         <LibraryClient library={library} />
       </div>
+
+      <Footer />
     </main>
   );
 }

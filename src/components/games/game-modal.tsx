@@ -64,35 +64,35 @@ export function GameModal({ game, onClose, actions }: GameModalProps) {
   const coverUrl = getCoverUrl(game);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
-      onClick={onClose}
-    >
-    <div className="flex min-h-full items-center justify-center">
+  <div
+    className="fixed inset-0 z-50 overflow-y-auto bg-black/70 px-4 py-6"
+    onClick={onClose}
+  >
+    <div className="flex min-h-full items-start justify-center md:items-center">
       <div
-        className="relative grid max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl md:grid-cols-[340px_1fr]"
+        className="relative grid w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl md:max-h-[90vh] md:grid-cols-[340px_1fr]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* CLOSE BUTTON */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 z-10 rounded-full bg-black/70 px-3 py-1 text-sm font-medium text-white transition hover:bg-black"
+          className="absolute right-4 top-4 z-20 rounded-full bg-black/70 px-3 py-1 text-sm font-medium text-white transition hover:bg-black"
         >
           ✕
         </button>
 
-        {/* LEFT SIDE — COVER */}
-        <div className="bg-gray-900 p-6 md:flex md:items-center md:justify-center">
+        {/* COVER */}
+        <div className="bg-gray-900 p-4 md:flex md:items-center md:justify-center md:p-6">
           <img
             src={coverUrl}
             alt={game.name}
-            className="mx-auto aspect-[3/4] max-h-[70vh] w-full max-w-[300px] rounded-xl object-cover shadow-lg"
+            className="mx-auto aspect-[3/4] max-h-[260px] w-auto rounded-xl object-cover shadow-lg md:max-h-[70vh] md:w-full md:max-w-[300px]"
           />
         </div>
 
-        {/* RIGHT SIDE — DETAILS */}
-        <div className="max-h-[55vh] overflow-y-auto p-6 md:max-h-[90vh] md:p-8">
-          <h2 className="mb-4 pr-10 text-3xl font-bold text-gray-900">
+        {/* DETAILS */}
+        <div className="p-6 md:max-h-[90vh] md:overflow-y-auto md:p-8">
+          <h2 className="mb-4 pr-10 text-2xl font-bold text-gray-900 md:text-3xl">
             {game.name}
           </h2>
 
@@ -106,13 +106,11 @@ export function GameModal({ game, onClose, actions }: GameModalProps) {
             </span>
           </div>
 
-          <div className="mb-3 flex flex-wrap gap-3">
-            {actions && (
+          {actions && (
             <div className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
               {actions}
             </div>
-            )}
-          </div>
+          )}
 
           <div className="mb-6">
             <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
@@ -159,7 +157,7 @@ export function GameModal({ game, onClose, actions }: GameModalProps) {
                     key={`${platform.id}-${platform.abbreviation ?? platform.name}`}
                     className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm"
                   >
-                    🎮 {getPlatformLabel(platform)}
+                    {getPlatformLabel(platform)}
                   </span>
                 ))}
               </div>
@@ -172,6 +170,6 @@ export function GameModal({ game, onClose, actions }: GameModalProps) {
         </div>
       </div>
     </div>
-    </div>
-  );
+  </div>
+);
 }

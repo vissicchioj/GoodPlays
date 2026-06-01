@@ -4,6 +4,7 @@ import { SignInButton } from "../components/auth/sign-in-button";
 import { SignOutButton } from "../components/auth/sign-out-button";
 import { GameSearch } from "../components/games/game-search";
 import { Navbar } from "../components/layout/navbar";
+import { Footer } from "../components/layout/footer";
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
@@ -27,6 +28,9 @@ export default async function HomePage() {
         {/* SEARCH */}
         <GameSearch />
       </section>
+
+      {/* FOOTER */}
+      <Footer />
     </main>
   );
 }
