@@ -13,14 +13,14 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const user = await prisma.user.upsert({
-    where: { email: "demo@goodplays.dev" },
-    update: {},
-    create: {
-      email: "demo@goodplays.dev",
-      username: "jake_dev",
-      image: "https://github.com/github.png",
-    },
-  });
+  where: { email: "demo@goodplays.dev" },
+  update: {},
+  create: {
+    email: "demo@goodplays.dev",
+    name: "Jake Dev",
+    image: "https://github.com/github.png",
+  },
+});
 
   const game1 = await prisma.game.upsert({
     where: { igdbId: 1 },

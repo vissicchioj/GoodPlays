@@ -34,8 +34,8 @@ type LibraryGameCardProps = {
     tags: GameLogTag[];
     game: {
       id: string;
-      igdbId?: number;
-      slug?: string;
+      igdbId?: number | null;
+      slug?: string | null;
       title: string;
       summary?: string | null;
       coverUrl?: string | null;

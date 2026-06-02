@@ -15,7 +15,7 @@ type Genre = {
 };
 
 type Game = {
-  id: string;
+  id: string | number;
   slug?: string;
   name: string;
   summary?: string;
