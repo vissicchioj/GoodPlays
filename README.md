@@ -1,5 +1,7 @@
 # Goodplays
 
+https://good-plays-jhti.vercel.app/
+
 Goodplays is a video game tracking/review app inspired by Goodreads and Letterboxd. 
 Users can discover games, save games to their personal library, update play status, and manage their backlog.
 
