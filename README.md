@@ -84,5 +84,5 @@ The core loop is...
 - Journal Feature: Write journal entries for currently played games. Include Playtime logs to track how long you played.
 - Review Feature: Write reviews for games. Any game that is reviewed without the Completed tag will be noted.
 
-
+---
 
