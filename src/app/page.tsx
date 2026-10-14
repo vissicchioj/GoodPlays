@@ -1,7 +1,5 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
-import { SignInButton } from "../components/auth/sign-in-button";
-import { SignOutButton } from "../components/auth/sign-out-button";
 import { GameSearch } from "../components/games/game-search";
 import { Navbar } from "../components/layout/navbar";
 import { Footer } from "../components/layout/footer";
@@ -15,11 +13,9 @@ export default async function HomePage() {
       <Navbar session={session} />
 
       {/* MAIN CONTENT */}
-      <section className="max-w-4xl mx-auto px-6 py-10">
+      <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
         <div className="mb-8 text-center">
-          <h2 className="text-3xl font-semibold mb-2">
-            Track your games
-          </h2>
+          <h2 className="mb-2 text-3xl font-semibold">Track your games</h2>
           <p className="text-gray-600">
             Search for a game and add it to your backlog.
           </p>

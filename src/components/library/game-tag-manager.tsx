@@ -1,24 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { createLibraryTag } from "../../server/actions/create-library-tag";
 import { addTagToGameLog } from "../../server/actions/add-tag-to-game-log";
 import { removeTagFromGameLog } from "../../server/actions/remove-tag-from-game-log";
-
-type LibraryTag = {
-  id: string;
-  name: string;
-};
+import { TAG_NAME_MAX_LENGTH, type TagSummary } from "../../lib/tags";
 
 type GameLogTag = {
   id: string;
-  tag: LibraryTag;
+  tag: TagSummary;
 };
 
 type GameTagManagerProps = {
   gameLogId: string;
   currentTags: GameLogTag[];
-  allTags: LibraryTag[];
+  allTags: TagSummary[];
 };
 
 export function GameTagManager({
@@ -28,60 +24,67 @@ export function GameTagManager({
 }: GameTagManagerProps) {
   const [newTagName, setNewTagName] = useState("");
   const [selectedTagId, setSelectedTagId] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const currentTagIds = new Set(currentTags.map((tag) => tag.tag.id));
+  // One transition for every tag change in this panel, so the controls are
+  // disabled while any of them is saving and can't be double-submitted.
+  const [isPending, startTransition] = useTransition();
 
+  const currentTagIds = new Set(currentTags.map((gameLogTag) => gameLogTag.tag.id));
   const availableTags = allTags.filter((tag) => !currentTagIds.has(tag.id));
 
-  async function handleCreateTag() {
+  function handleCreateTag() {
     if (!newTagName.trim()) return;
 
-    try {
-      setIsCreating(true);
-      setError(null);
+    setError(null);
 
-      const createdTag = await createLibraryTag(newTagName);
+    startTransition(async () => {
+      try {
+        const result = await createLibraryTag(newTagName);
 
-      await addTagToGameLog(gameLogId, createdTag.id);
+        // Expected problems (too long, etc.) come back as a value with a
+        // message we can show; see TagActionResult in lib/tags.ts.
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
 
-      setNewTagName("");
-    } catch (err) {
-      console.error("Failed to create tag:", err);
-      setError("Could not create tag");
-    } finally {
-      setIsCreating(false);
-    }
+        await addTagToGameLog(gameLogId, result.tag.id);
+        setNewTagName("");
+      } catch (err) {
+        console.error("Failed to create tag:", err);
+        setError("Could not create tag");
+      }
+    });
   }
 
-  async function handleAddExistingTag() {
+  function handleAddExistingTag() {
     if (!selectedTagId) return;
 
-    try {
-      setIsAdding(true);
-      setError(null);
+    setError(null);
 
-      await addTagToGameLog(gameLogId, selectedTagId);
-
-      setSelectedTagId("");
-    } catch (err) {
-      console.error("Failed to add tag:", err);
-      setError("Could not add tag");
-    } finally {
-      setIsAdding(false);
-    }
+    startTransition(async () => {
+      try {
+        await addTagToGameLog(gameLogId, selectedTagId);
+        setSelectedTagId("");
+      } catch (err) {
+        console.error("Failed to add tag:", err);
+        setError("Could not add tag");
+      }
+    });
   }
 
-  async function handleRemoveTag(gameLogTagId: string) {
-    try {
-      setError(null);
-      await removeTagFromGameLog(gameLogTagId);
-    } catch (err) {
-      console.error("Failed to remove tag:", err);
-      setError("Could not remove tag");
-    }
+  function handleRemoveTag(gameLogTagId: string) {
+    setError(null);
+
+    startTransition(async () => {
+      try {
+        await removeTagFromGameLog(gameLogTagId);
+      } catch (err) {
+        console.error("Failed to remove tag:", err);
+        setError("Could not remove tag");
+      }
+    });
   }
 
   return (
@@ -98,11 +101,11 @@ export function GameTagManager({
             {currentTags.map((gameLogTag) => (
               <button
                 key={gameLogTag.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemoveTag(gameLogTag.id);
-                }}
-                className="rounded-full bg-black px-3 py-1 text-sm font-medium text-white transition hover:bg-red-600"
+                type="button"
+                onClick={() => handleRemoveTag(gameLogTag.id)}
+                disabled={isPending}
+                aria-label={`Remove tag ${gameLogTag.tag.name} from this game`}
+                className="rounded-full bg-black px-3 py-1 text-sm font-medium text-white transition hover:bg-red-600 disabled:cursor-wait disabled:opacity-60"
                 title="Click to remove tag"
               >
                 {gameLogTag.tag.name} ×
@@ -115,9 +118,9 @@ export function GameTagManager({
       {availableTags.length > 0 && (
         <div className="flex flex-col gap-2 sm:flex-row">
           <select
+            aria-label="Add an existing tag"
             value={selectedTagId}
             onChange={(e) => setSelectedTagId(e.target.value)}
-            onClick={(e) => e.stopPropagation()}
             className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
           >
             <option value="">Add existing tag...</option>
@@ -129,41 +132,47 @@ export function GameTagManager({
           </select>
 
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAddExistingTag();
-            }}
-            disabled={!selectedTagId || isAdding}
+            type="button"
+            onClick={handleAddExistingTag}
+            disabled={!selectedTagId || isPending}
             className="rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isAdding ? "Adding..." : "Add"}
+            Add
           </button>
         </div>
       )}
 
-      <div className="flex flex-col gap-2 sm:flex-row">
+      {/* A <form> means pressing Enter in the input creates the tag. */}
+      <form
+        className="flex flex-col gap-2 sm:flex-row"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleCreateTag();
+        }}
+      >
         <input
+          aria-label="New tag name"
           value={newTagName}
           onChange={(e) => setNewTagName(e.target.value)}
-          onClick={(e) => e.stopPropagation()}
+          maxLength={TAG_NAME_MAX_LENGTH}
           placeholder="Create new tag..."
           className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
         />
 
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleCreateTag();
-          }}
-          disabled={!newTagName.trim() || isCreating}
+          type="submit"
+          disabled={!newTagName.trim() || isPending}
           className="rounded-lg bg-purple-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isCreating ? "Creating..." : "Create"}
+          {isPending ? "Saving..." : "Create"}
         </button>
-      </div>
+      </form>
 
       {error && (
-        <p className="rounded bg-red-600 px-3 py-2 text-sm font-medium text-white">
+        <p
+          role="alert"
+          className="rounded bg-red-600 px-3 py-2 text-sm font-medium text-white"
+        >
           {error}
         </p>
       )}

@@ -4,7 +4,7 @@ export function Footer() {
   return (
     <footer className="border-t border-gray-200 bg-white px-8 py-6 text-center text-sm text-gray-500">
       <p>
-        {currentYear} Goodplays. Jake Vissicchio.
+        © {currentYear} Goodplays · Jake Vissicchio. All rights reserved.
       </p>
     </footer>
   );

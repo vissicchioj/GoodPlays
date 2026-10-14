@@ -3,21 +3,32 @@ import { searchGames } from "../../../../server/queries/search-games";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/db";
+import type { DiscoverGame, IgdbGame } from "../../../../types/igdb";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const query = searchParams.get("q") || "";
+  const query = searchParams.get("q") ?? "";
 
-  const games = await searchGames(query);
+  let games: IgdbGame[];
 
-  if (!Array.isArray(games)) {
-    return NextResponse.json(games);
+  // igdbFetch now throws on failure instead of returning IGDB's error body.
+  // Catch it here, log the details on the server, and send the browser a clear
+  // status code and a message that's safe to display.
+  try {
+    games = await searchGames(query);
+  } catch (error) {
+    console.error("Game search failed:", error);
+
+    return NextResponse.json(
+      { error: "Game search is unavailable right now. Please try again." },
+      { status: 502 },
+    );
   }
 
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    const gamesWithoutLibraryStatus = games.map((game) => ({
+    const gamesWithoutLibraryStatus: DiscoverGame[] = games.map((game) => ({
       ...game,
       isInLibrary: false,
       libraryStatus: null,
@@ -26,9 +37,7 @@ export async function GET(req: Request) {
     return NextResponse.json(gamesWithoutLibraryStatus);
   }
 
-  const igdbIds = games
-    .map((game) => game.id)
-    .filter((id): id is number => typeof id === "number");
+  const igdbIds = games.map((game) => game.id);
 
   const savedLogs = await prisma.gameLog.findMany({
     where: {
@@ -51,10 +60,10 @@ export async function GET(req: Request) {
         gameLogId: log.id,
         status: log.status,
       },
-    ])
+    ]),
   );
 
-  const gamesWithLibraryStatus = games.map((game) => {
+  const gamesWithLibraryStatus: DiscoverGame[] = games.map((game) => {
     const savedGame = savedGameMap.get(game.id);
 
     return {
